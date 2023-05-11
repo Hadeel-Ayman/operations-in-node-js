@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
+const jwt = require('jsonwebtoken')
 
 const bcryptjs = require('bcryptjs')
 const UserSchema = new mongoose.Schema({
@@ -39,16 +40,21 @@ const UserSchema = new mongoose.Schema({
                 throw new Error('age must be positive')
             }
         }
-    }
+    },
+    tokens: [
+        {
+            type: String,
+            required: true
+        }
+    ]
 })
 
-
+// crypt data before save operation
 UserSchema.pre('save', async function () {
     const user = this
     user.password = await bcryptjs.hash(user.password, 8)
 
 })
-
 
 UserSchema.statics.findByCredentials = async (emailOfBody, passwordOfBody) => {
     const user = await User.findOne({ email: emailOfBody })
@@ -66,6 +72,27 @@ UserSchema.statics.findByCredentials = async (emailOfBody, passwordOfBody) => {
 }
 
 
-const User = mongoose.model('User', UserSchema)
+// generateToken
 
+UserSchema.methods.generateToken = async function () {
+    const user = this
+    const token = jwt.sign({ id: user._id.toString() }, 'hadeel')
+    user.tokens = user.tokens.concat(token)
+    await user.save()
+    return token
+}
+
+// hide data
+
+UserSchema.methods.toJSON = function () {
+    const user = this
+    const userOfObject = user.toObject()
+
+    delete userOfObject.password
+    delete userOfObject.tokens
+    return userOfObject
+}
+
+
+const User = mongoose.model('User', UserSchema)
 module.exports = User

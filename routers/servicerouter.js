@@ -16,6 +16,7 @@ router.post('/services', auth, async (req, res) => {
 
 })
 
+// get all service
 router.get('/services', auth, async (req, res) => {
     try {
         const services = await Service.find({})
@@ -26,6 +27,7 @@ router.get('/services', auth, async (req, res) => {
     }
 })
 
+// get single service
 router.get('/services/:id', auth, async (req, res) => {
     try {
         const id = req.params.id

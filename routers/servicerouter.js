@@ -58,8 +58,9 @@ router.patch('/service/:id', auth, async (req, res) => {
 })
 
 router.delete('/service/:id', auth, async (req, res) => {
+    const id = req.params.id
     try {
-        const service = await Service.findByIdAndDelete(req.params.id)
+        const service = await Service.findByIdAndDelete(id)
         if (!service) {
             res.status(404).send('No service is found')
         }

@@ -31,7 +31,7 @@ router.get('/services/:id', auth, async (req, res) => {
         const id = req.params.id
         const service = await Service.findOne({ _id: id, owner: req.user._id })
         if (!service) {
-            return res.status(404).send('you not owner')
+            return res.status(404).send('you are not owner')
         }
         res.send(service)
     }
